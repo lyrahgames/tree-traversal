@@ -148,52 +148,52 @@ struct tree_printer {
   }
 };
 
-template <typename Node>
-struct tree_printer2 {
-  vector<vector<pair<int, char>>> lines;
-  int size{};
-  int depth{};
+// template <typename Node>
+// struct tree_printer2 {
+//   vector<vector<pair<int, char>>> lines;
+//   int size{};
+//   int depth{};
 
-  tree_printer2(const unique_ptr<Node>& root, int max_size, int max_depth)
-      : buffer{max_size, 2 * max_depth - 1} {
-    print(root);
-  }
+//   tree_printer2(const unique_ptr<Node>& root, int max_size, int max_depth)
+//       : buffer{max_size, 2 * max_depth - 1} {
+//     print(root);
+//   }
 
-  struct info {
-    int root_position;
-    int new_offset;
-  };
+//   struct info {
+//     int root_position;
+//     int new_offset;
+//   };
 
-  info print(const unique_ptr<Node>& root, int depth, int offset) {
-    if (depth >= lines.size()) lines.resize(depth + 1);
+//   info print(const unique_ptr<Node>& root, int depth, int offset) {
+//     if (depth >= lines.size()) lines.resize(depth + 1);
 
-    if (root->left_) {
-      const auto tmp = print(root->left_, depth + 1, offset);
-      lines[index + 1].push_back({tmp.root_position, '_'});
-      for (int i = tmp.root_position + 1; i < tmp.offset; ++i)
-        lines[index + 1][i] = '_';
-    }
+//     if (root->left_) {
+//       const auto tmp = print(root->left_, depth + 1, offset);
+//       lines[index + 1].push_back({tmp.root_position, '_'});
+//       for (int i = tmp.root_position + 1; i < tmp.offset; ++i)
+//         lines[index + 1][i] = '_';
+//     }
 
-    const auto label = to_string(root->data_);
-    for (int i = 0; i < std::size(label); ++i) {
-      buffer(size - std::size(label) / 2 + i, 2 * (depth - 1)) = label[i];
-    }
-    const int root_pos = size;
-    size += std::size(label);
-    if (left_child_pos > -1 || right_child_pos > -1)
-      buffer(root_pos, 2 * depth + 1) = '|';
+//     const auto label = to_string(root->data_);
+//     for (int i = 0; i < std::size(label); ++i) {
+//       buffer(size - std::size(label) / 2 + i, 2 * (depth - 1)) = label[i];
+//     }
+//     const int root_pos = size;
+//     size += std::size(label);
+//     if (left_child_pos > -1 || right_child_pos > -1)
+//       buffer(root_pos, 2 * depth + 1) = '|';
 
-    if (root->right_) {
-      print(root->right_, depth + 1);
-      buffer(right_child_pos, 2 * depth + 1) = '_';
-      for (int i = root_pos + 1; i < right_child_pos; ++i) {
-        buffer(i, 2 * depth + 1) = '_';
-      }
-    }
+//     if (root->right_) {
+//       print(root->right_, depth + 1);
+//       buffer(right_child_pos, 2 * depth + 1) = '_';
+//       for (int i = root_pos + 1; i < right_child_pos; ++i) {
+//         buffer(i, 2 * depth + 1) = '_';
+//       }
+//     }
 
-    return root_pos;
-  }
-};
+//     return root_pos;
+//   }
+// };
 
 template <typename T>
 ostream& operator<<(ostream& os, const unique_ptr<node<T>>& root) {
