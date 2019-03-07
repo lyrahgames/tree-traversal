@@ -28,7 +28,8 @@ struct console_display_buffer {
   }
 };
 
-std::ostream& operator<<(std::ostream& os, console_display_buffer& buffer) {
+inline std::ostream& operator<<(std::ostream& os,
+                                console_display_buffer& buffer) {
   // auto tmp = buffer.data;
   decltype(buffer.data) tmp(buffer.data.size());
   counting_sort(begin(buffer.data), end(buffer.data), begin(tmp),
@@ -46,6 +47,50 @@ std::ostream& operator<<(std::ostream& os, console_display_buffer& buffer) {
     }
     const auto tmp = e.column - column;
     os << std::string((tmp < 0) ? (0) : (tmp), ' ') << e.text;
+    column = e.column + size(e.text);
+  }
+  return os << '\n';
+}
+
+struct wconsole_display_buffer {
+  struct element {
+    element() = default;
+    template <typename T>
+    element(int r, int c, T&& t)
+        : row{r}, column{c}, text{std::forward<T>(t)} {}
+    int row;
+    int column;
+    std::wstring text;
+  };
+
+  std::vector<element> data;
+
+  template <typename... Args>
+  wconsole_display_buffer& emplace(Args&&... args) {
+    data.emplace_back(std::forward<Args>(args)...);
+    return *this;
+  }
+};
+
+inline std::wostream& operator<<(std::wostream& os,
+                                 wconsole_display_buffer& buffer) {
+  // auto tmp = buffer.data;
+  decltype(buffer.data) tmp(buffer.data.size());
+  counting_sort(begin(buffer.data), end(buffer.data), begin(tmp),
+                [](const auto& e) { return e.column; });
+  counting_sort(begin(tmp), end(tmp), begin(buffer.data),
+                [](const auto& e) { return e.row; });
+
+  auto row = 0;
+  auto column = 0;
+  for (const auto& e : buffer.data) {
+    if (row != e.row) {
+      os << std::wstring(e.row - row, '\n');
+      row = e.row;
+      column = 0;
+    }
+    const auto tmp = e.column - column;
+    os << std::wstring((tmp < 0) ? (0) : (tmp), ' ') << e.text;
     column = e.column + size(e.text);
   }
   return os << '\n';
